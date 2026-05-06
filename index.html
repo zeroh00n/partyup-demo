@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechCorp - 로그인</title>
+  <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Gaegu', cursive;
+      background: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 헤더 - rough.js가 그림 */
+    .header {
+      position: relative;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 1;
+    }
+    .header canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .header-logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+    }
+    .header-nav a {
+      color: #555;
+      text-decoration: none;
+      font-size: 20px;
+      margin-left: 20px;
+    }
+
+    /* 메인 */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px;
+    }
+
+    /* 로그인 카드 - canvas 위에 콘텐츠 */
+    .login-card {
+      position: relative;
+      width: 400px;
+      padding: 40px 36px;
+    }
+    .login-card canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    .login-title {
+      font-size: 38px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .login-subtitle {
+      font-size: 18px;
+      color: #999;
+      margin-bottom: 24px;
+    }
+
+    /* 폼 - input은 투명, 밑에 canvas가 테두리 */
+    .form-group {
+      position: relative;
+      margin-bottom: 18px;
+    }
+    .form-label {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .input-wrap {
+      position: relative;
+      height: 44px;
+    }
+    .input-wrap canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+    .form-input {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      font-family: 'Gaegu', cursive;
+      color: #333;
+      outline: none;
+    }
+
+    /* 캡챠 영역 */
+    .captcha-area {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      padding: 14px;
+    }
+    .captcha-area canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    /* 버튼 */
+    .btn-wrap {
+      position: relative;
+      height: 52px;
+      cursor: pointer;
+    }
+    .btn-wrap canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+    .login-btn {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'Gaegu', cursive;
+      color: #fff;
+      cursor: pointer;
+    }
+    .login-btn:disabled {
+      color: #aaa;
+      cursor: not-allowed;
+    }
+
+    /* 하단 */
+    .login-footer {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 18px;
+      color: #999;
+    }
+    .login-footer a { color: #e91e63; text-decoration: none; font-weight: 700; }
+
+    /* 토스트 */
+    .toast {
+      position: fixed;
+      top: 20px; right: 20px;
+      padding: 12px 20px;
+      font-size: 20px;
+      font-family: 'Gaegu', cursive;
+      font-weight: 700;
+      border: 3px solid #333;
+      transform: translateX(150%);
+      transition: transform 0.3s;
+      z-index: 100000;
+    }
+    .toast.show { transform: translateX(0); }
+    .toast-success { background: #c8e6c9; color: #1b5e20; }
+    .toast-error { background: #ffcdd2; color: #b71c1c; }
+
+    /* 디버그 */
+    .debug-panel {
+      position: fixed;
+      bottom: 12px; right: 12px;
+      width: 280px;
+      background: #111;
+      color: #0f0;
+      border: 2px solid #0f0;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+    }
+    .debug-header {
+      padding: 4px 8px;
+      background: #001a00;
+      border-bottom: 1px solid #0f0;
+      font-weight: 700;
+    }
+    .debug-body {
+      padding: 4px 8px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    .debug-body div { padding: 1px 0; }
+    .debug-body .val-success { color: #0f0; }
+    .debug-body .val-error { color: #f44; }
+
+    /* 푸터 */
+    .page-footer {
+      position: relative;
+      text-align: center;
+      padding: 12px;
+      font-size: 16px;
+      color: #aaa;
+    }
+    .page-footer canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    /* 배경 낙서 캔버스 */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: -2;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- 헤더 -->
+  <header class="header">
+    <canvas id="header-bg"></canvas>
+    <div class="header-logo">TechCorp</div>
+    <nav class="header-nav">
+      <a href="#">제품</a>
+      <a href="#">가격</a>
+      <a href="#">문서</a>
+      <a href="#">지원</a>
+    </nav>
+  </header>
+
+  <!-- 로그인 카드 -->
+  <main class="main">
+    <div class="login-card">
+      <canvas id="card-bg"></canvas>
+      <h1 class="login-title">로그인</h1>
+      <p class="login-subtitle">TechCorp 계정으로 로그인하세요.</p>
+
+      <form id="loginForm" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label">이메일</label>
+          <div class="input-wrap">
+            <canvas class="input-border"></canvas>
+            <input type="email" class="form-input" placeholder="user@techcorp.com" value="demo@techcorp.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">비밀번호</label>
+          <div class="input-wrap">
+            <canvas class="input-border"></canvas>
+            <input type="password" class="form-input" placeholder="비밀번호" value="password123">
+          </div>
+        </div>
+
+        <div class="captcha-area">
+          <canvas class="captcha-border"></canvas>
+          <div id="partyup-captcha"></div>
+        </div>
+
+        <div class="btn-wrap">
+          <canvas id="btn-bg"></canvas>
+          <button type="submit" class="login-btn" id="loginBtn" disabled>로그인</button>
+        </div>
+      </form>
+
+      <div class="login-footer">
+        계정이 없으신가요? <a href="#">회원가입</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- 토스트 -->
+  <div class="toast toast-success" id="successToast">로그인 성공!</div>
+  <div class="toast toast-error" id="errorToast"></div>
+
+  <!-- 디버그 -->
+  <div class="debug-panel">
+    <div class="debug-header">[SDK Debug]</div>
+    <div class="debug-body" id="debugBody">
+      <div>> waiting...</div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="page-footer">
+    <canvas id="footer-bg"></canvas>
+    © 2026 TechCorp — Party-Up CAPTCHA 데모
+  </footer>
+
+  <!-- ── 모든 UI를 rough.js로 그리기 ── -->
+  <script>
+    var R = 3.5;  // roughness — 높을수록 삐뚤
+
+    function drawRoughRect(canvasEl, opts) {
+      var w = canvasEl.parentElement.offsetWidth;
+      var h = canvasEl.parentElement.offsetHeight;
+      canvasEl.width = w;
+      canvasEl.height = h;
+      var rc = rough.canvas(canvasEl);
+      var o = Object.assign({ stroke: '#333', strokeWidth: 2, roughness: R }, opts || {});
+      rc.rectangle(2, 2, w - 4, h - 4, o);
+    }
+
+    function initRoughUI() {
+      // 헤더 배경
+      var hc = document.getElementById('header-bg');
+      hc.width = hc.parentElement.offsetWidth;
+      hc.height = hc.parentElement.offsetHeight;
+      var rc = rough.canvas(hc);
+      rc.rectangle(0, 0, hc.width, hc.height, {
+        stroke: '#333', strokeWidth: 2.5, roughness: R,
+        fill: '#fffde7', fillStyle: 'solid'
+      });
+
+      // 로그인 카드
+      var cc = document.getElementById('card-bg');
+      cc.width = cc.parentElement.offsetWidth;
+      cc.height = cc.parentElement.offsetHeight;
+      rc = rough.canvas(cc);
+      rc.rectangle(3, 3, cc.width - 6, cc.height - 6, {
+        stroke: '#333', strokeWidth: 3, roughness: R,
+        fill: '#fff', fillStyle: 'solid'
+      });
+      // 그림자 느낌 — 오른쪽 아래에 한 줄 더
+      rc.line(10, cc.height - 1, cc.width + 3, cc.height - 1, { stroke: '#bbb', strokeWidth: 3, roughness: R });
+      rc.line(cc.width - 1, 10, cc.width - 1, cc.height + 3, { stroke: '#bbb', strokeWidth: 3, roughness: R });
+
+      // input 테두리
+      document.querySelectorAll('.input-border').forEach(function(c) {
+        drawRoughRect(c, { fill: '#fafaf5', fillStyle: 'solid', strokeWidth: 2 });
+      });
+
+      // 캡챠 영역 — 점선
+      var cap = document.querySelector('.captcha-border');
+      cap.width = cap.parentElement.offsetWidth;
+      cap.height = cap.parentElement.offsetHeight;
+      rc = rough.canvas(cap);
+      rc.rectangle(2, 2, cap.width - 4, cap.height - 4, {
+        stroke: '#999', strokeWidth: 1.5, roughness: R,
+        strokeLineDash: [8, 6],
+        fill: '#f9f9f0', fillStyle: 'solid'
+      });
+
+      // 버튼
+      var btn = document.getElementById('btn-bg');
+      btn.width = btn.parentElement.offsetWidth;
+      btn.height = btn.parentElement.offsetHeight;
+      rc = rough.canvas(btn);
+      rc.rectangle(2, 2, btn.width - 4, btn.height - 4, {
+        stroke: '#333', strokeWidth: 3, roughness: R,
+        fill: '#4285f4', fillStyle: 'solid'
+      });
+
+      // 푸터
+      var fc = document.getElementById('footer-bg');
+      fc.width = fc.parentElement.offsetWidth;
+      fc.height = fc.parentElement.offsetHeight;
+      rc = rough.canvas(fc);
+      rc.line(0, 2, fc.width, 2, { stroke: '#ccc', strokeWidth: 2, roughness: R });
+
+      // 배경 낙서
+      drawBgDoodles();
+    }
+
+    function drawBgDoodles() {
+      var c = document.getElementById('bg-canvas');
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+      var rc = rough.canvas(c);
+      var w = c.width, h = c.height;
+
+      // 흩어진 낙서들
+      rc.circle(80, 200, 50, { stroke: '#e0e0e0', strokeWidth: 1.5, roughness: 4 });
+      rc.circle(w - 100, 180, 35, { stroke: '#eee', strokeWidth: 1, roughness: 4 });
+      rc.line(40, h - 100, 150, h - 120, { stroke: '#e8e8e8', strokeWidth: 2, roughness: 4 });
+      rc.rectangle(w - 180, h - 200, 60, 40, { stroke: '#eee', strokeWidth: 1.5, roughness: 4 });
+
+      // 화살표
+      rc.line(160, 120, 230, 100, { stroke: '#ddd', strokeWidth: 2, roughness: 3 });
+      rc.line(220, 95, 230, 100, { stroke: '#ddd', strokeWidth: 2, roughness: 3 });
+      rc.line(224, 108, 230, 100, { stroke: '#ddd', strokeWidth: 2, roughness: 3 });
+
+      // 별
+      rc.polygon([
+        [w-60, 80], [w-53, 95], [w-38, 98], [w-48, 108],
+        [w-46, 123], [w-60, 115], [w-74, 123], [w-72, 108],
+        [w-82, 98], [w-67, 95]
+      ], { stroke: '#eee', strokeWidth: 1, roughness: 3 });
+    }
+
+    // DOM 준비 후 그리기
+    window.addEventListener('load', initRoughUI);
+    window.addEventListener('resize', initRoughUI);
+
+    // 버튼 상태 변경 시 색 다시 그리기
+    var _origDisabled = null;
+    setInterval(function() {
+      var btn = document.getElementById('loginBtn');
+      if (btn.disabled !== _origDisabled) {
+        _origDisabled = btn.disabled;
+        var bc = document.getElementById('btn-bg');
+        bc.width = bc.parentElement.offsetWidth;
+        bc.height = bc.parentElement.offsetHeight;
+        var rc = rough.canvas(bc);
+        rc.rectangle(2, 2, bc.width - 4, bc.height - 4, {
+          stroke: '#333', strokeWidth: 3, roughness: R,
+          fill: btn.disabled ? '#ccc' : '#4285f4', fillStyle: 'solid'
+        });
+      }
+    }, 300);
+  </script>
+
+  <!-- SDK -->
+  <script defer src="http://210.109.15.10/sdk/partyup-captcha.js"></script>
+
+  <script>
+    function debugLog(key, value, type) {
+      var body = document.getElementById('debugBody');
+      var div = document.createElement('div');
+      var cls = type === 'success' ? 'val-success' : type === 'error' ? 'val-error' : '';
+      div.innerHTML = '<span style="color:#888;">> </span><span class="' + cls + '">' + key + ': ' + value + '</span>';
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function showToast(type, message) {
+      var el = type === 'success' ? document.getElementById('successToast') : document.getElementById('errorToast');
+      if (type === 'error') el.textContent = message;
+      el.classList.add('show');
+      setTimeout(function () { el.classList.remove('show'); }, 4000);
+    }
+
+    var captchaToken = null;
+
+    function initCaptcha() {
+      if (typeof PartyUpCaptcha === 'undefined') {
+        setTimeout(initCaptcha, 100);
+        return;
+      }
+      debugLog('init', 'SDK v' + PartyUpCaptcha.version);
+
+      PartyUpCaptcha.render('#partyup-captcha', {
+        siteKey: 'pk_test_techcorp_demo_key',
+        apiBase: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'http://localhost:8000'
+          : 'http://210.109.15.10',
+        triggerType: 'new_ip_login',
+        onSuccess: function (token) {
+          captchaToken = token;
+          document.getElementById('loginBtn').disabled = false;
+          debugLog('PASS', 'token OK', 'success');
+        },
+        onError: function (message) {
+          debugLog('ERR', message, 'error');
+        }
+      });
+      debugLog('status', 'ready');
+
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!captchaToken) { showToast('error', '캡챠를 먼저 완료해주세요'); return; }
+        debugLog('login', 'OK', 'success');
+        showToast('success');
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCaptcha);
+    } else { initCaptcha(); }
+  </script>
+
+</body>
+</html>
