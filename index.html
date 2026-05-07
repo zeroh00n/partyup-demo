@@ -254,6 +254,16 @@
       <h1 class="login-title">로그인</h1>
       <p class="login-subtitle">TechCorp 계정으로 로그인하세요.</p>
 
+      <!-- SaaS API 키 입력 영역 -->
+      <div class="form-group" id="apiKeyGroup">
+        <label class="form-label" style="font-size:16px; color:#e91e63;">Party-Up API Key (SaaS)</label>
+        <div class="input-wrap">
+          <canvas class="input-border"></canvas>
+          <input type="text" class="form-input" id="apiKeyInput" placeholder="pk_live_partyup_demo_..." value="pk_live_partyup_demo_66eea283d9c118ea" style="font-size:14px; font-family: 'Courier New', monospace;">
+        </div>
+        <button onclick="applySiteKey()" style="margin-top:6px; padding:4px 14px; font-family:'Gaegu',cursive; font-size:18px; font-weight:700; background:#e91e63; color:#fff; border:2px solid #333; cursor:pointer; border-radius:0;">캡챠 로드</button>
+      </div>
+
       <form id="loginForm" onsubmit="return false;">
         <div class="form-group">
           <label class="form-label">이메일</label>
@@ -449,19 +459,34 @@
     }
 
     var captchaToken = null;
+    var apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8000'
+      : 'https://party-up.store';
 
-    function initCaptcha() {
+    function applySiteKey() {
+      var key = document.getElementById('apiKeyInput').value.trim();
+      if (!key) { showToast('error', 'API 키를 입력하세요'); return; }
+      debugLog('siteKey', key);
+
+      // 기존 캡챠 초기화
+      var container = document.getElementById('partyup-captcha');
+      container.innerHTML = '';
+      captchaToken = null;
+      document.getElementById('loginBtn').disabled = true;
+
+      loadCaptcha(key);
+    }
+
+    function loadCaptcha(siteKey) {
       if (typeof PartyUpCaptcha === 'undefined') {
-        setTimeout(initCaptcha, 100);
+        setTimeout(function() { loadCaptcha(siteKey); }, 100);
         return;
       }
       debugLog('init', 'SDK v' + PartyUpCaptcha.version);
 
       PartyUpCaptcha.render('#partyup-captcha', {
-        siteKey: 'pk_test_techcorp_demo_key',
-        apiBase: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-          ? 'http://localhost:8000'
-          : 'https://party-up.store',
+        siteKey: siteKey,
+        apiBase: apiBase,
         triggerType: 'new_ip_login',
         onSuccess: function (token) {
           captchaToken = token;
@@ -472,7 +497,13 @@
           debugLog('ERR', message, 'error');
         }
       });
-      debugLog('status', 'ready');
+      debugLog('status', 'rendering captcha...');
+    }
+
+    // 페이지 로드 시 자동 로드
+    function initCaptcha() {
+      var key = document.getElementById('apiKeyInput').value.trim();
+      if (key) loadCaptcha(key);
 
       document.getElementById('loginForm').addEventListener('submit', function (e) {
         e.preventDefault();
