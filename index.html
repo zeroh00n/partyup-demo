@@ -429,7 +429,7 @@
   </script>
 
   <!-- SDK -->
-  <script defer src="http://210.109.15.10/sdk/partyup-captcha.js"></script>
+  <script defer src="https://party-up.store/sdk/partyup-captcha.js"></script>
 
   <script>
     function debugLog(key, value, type) {
@@ -461,7 +461,7 @@
         siteKey: 'pk_test_techcorp_demo_key',
         apiBase: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
           ? 'http://localhost:8000'
-          : 'http://210.109.15.10',
+          : 'https://party-up.store',
         triggerType: 'new_ip_login',
         onSuccess: function (token) {
           captchaToken = token;
