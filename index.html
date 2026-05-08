@@ -264,6 +264,16 @@
         <button onclick="applySiteKey()" style="margin-top:6px; padding:4px 14px; font-family:'Gaegu',cursive; font-size:18px; font-weight:700; background:#e91e63; color:#fff; border:2px solid #333; cursor:pointer; border-radius:0;">캡챠 로드</button>
       </div>
 
+      <!-- Secret Key 입력 (서버 검증 시뮬레이션) -->
+      <div class="form-group" id="secretKeyGroup">
+        <label class="form-label" style="font-size:16px; color:#4285f4;">Secret Key (서버 검증 시뮬레이션)</label>
+        <div class="input-wrap">
+          <canvas class="input-border"></canvas>
+          <input type="text" class="form-input" id="secretKeyInput" placeholder="발급 받은 secret_key를 입력해주세요." style="font-size:14px; font-family: 'Courier New', monospace;">
+        </div>
+        <p style="font-size:14px; color:#999; margin-top:4px;">※ 실제 서비스에서는 파트너 백엔드 서버에서 호출합니다.</p>
+      </div>
+
       <form id="loginForm" onsubmit="return false;">
         <div class="form-group">
           <label class="form-label">이메일</label>
@@ -505,11 +515,43 @@
       var key = document.getElementById('apiKeyInput').value.trim();
       if (key) loadCaptcha(key);
 
-      document.getElementById('loginForm').addEventListener('submit', function (e) {
+      document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         if (!captchaToken) { showToast('error', '캡챠를 먼저 완료해주세요'); return; }
-        debugLog('login', 'OK', 'success');
-        showToast('success');
+
+        var secretKey = document.getElementById('secretKeyInput').value.trim();
+        if (!secretKey) {
+          // secret_key 미입력 시 기존처럼 프론트 검증만
+          debugLog('login', 'OK (서버 검증 생략)', 'success');
+          showToast('success');
+          return;
+        }
+
+        // secret_key 입력 시 siteverify 호출
+        debugLog('siteverify', '서버 검증 요청 중...');
+        try {
+          var res = await fetch(apiBase + '/api/captcha/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              secret: secretKey,
+              response: captchaToken
+            })
+          });
+          var data = await res.json();
+
+          if (data.success) {
+            debugLog('siteverify', 'SUCCESS (score: ' + (data.score || '-') + ')', 'success');
+            showToast('success');
+          } else {
+            var errMsg = (data.error_codes || []).join(', ') || '검증 실패';
+            debugLog('siteverify', 'FAIL: ' + errMsg, 'error');
+            showToast('error', '서버 검증 실패: ' + errMsg);
+          }
+        } catch (err) {
+          debugLog('siteverify', 'ERROR: ' + err.message, 'error');
+          showToast('error', '서버 검증 요청 실패: ' + err.message);
+        }
       });
     }
 
