@@ -31,6 +31,7 @@
       color: #555; text-decoration: none; font-size: 20px; margin-left: 20px;
     }
 
+    /* ── 탭 네비게이션 ── */
     .tab-nav {
       display: flex;
       justify-content: center;
@@ -53,6 +54,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: flex; justify-content: center; padding: 24px 16px 40px; }
 
+    /* ── 공통 카드 ── */
     .card {
       position: relative;
       width: 460px;
@@ -64,6 +66,7 @@
     .card-title { font-size: 32px; font-weight: 700; color: #333; margin-bottom: 4px; }
     .card-sub { font-size: 16px; color: #999; margin-bottom: 24px; }
 
+    /* ── 폼 공통 ── */
     .form-group { position: relative; margin-bottom: 16px; }
     .form-label { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; display: block; }
     .form-label.small { font-size: 15px; color: #e91e63; }
@@ -78,6 +81,7 @@
     .form-input.mono { font-size: 13px; font-family: 'Courier New', monospace; }
     .form-hint { font-size: 13px; color: #999; margin-top: 4px; }
 
+    /* ── 버튼 ── */
     .btn-wrap { position: relative; height: 52px; cursor: pointer; }
     .btn-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     .main-btn {
@@ -95,12 +99,14 @@
     }
     .inline-btn.blue { background: #4285f4; }
 
+    /* ── L1 캡챠 영역 ── */
     .captcha-area {
       position: relative; display: flex; justify-content: center;
       margin: 20px 0; padding: 14px;
     }
     .captcha-area canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
+    /* ── L2 HandOCR ── */
     .mission-box {
       position: relative; padding: 18px 20px; margin: 16px 0; text-align: center;
     }
@@ -138,6 +144,7 @@
     .result-fail    { color: #b71c1c; }
     .result-neutral { color: #333; }
 
+    /* ── Chat AI ── */
     .chat-messages {
       height: 240px; overflow-y: auto; padding: 12px;
       margin: 16px 0; display: flex; flex-direction: column; gap: 8px;
@@ -171,9 +178,10 @@
     .settings-label { font-size: 16px; color: #555; min-width: 90px; }
     .settings-input {
       flex: 1; padding: 4px 8px; border: 2px solid #ccc;
-      font-size: 14px; font-family: 'Courier New', monospace;
+      font-family: 'Gaegu', cursive; font-size: 14px; font-family: 'Courier New', monospace;
     }
 
+    /* ── 디버그 패널 ── */
     .debug-panel {
       position: fixed; bottom: 12px; right: 12px; width: 300px;
       background: #111; color: #0f0; border: 2px solid #0f0;
@@ -186,6 +194,7 @@
     .val-error   { color: #f44; }
     .val-warn    { color: #fa0; }
 
+    /* ── 토스트 ── */
     .toast {
       position: fixed; top: 20px; right: 20px; padding: 12px 20px;
       font-size: 20px; font-family: 'Gaegu', cursive; font-weight: 700;
@@ -221,13 +230,14 @@
   </nav>
 </header>
 
+<!-- 탭 네비게이션 -->
 <div class="tab-nav">
   <button class="tab-btn active" onclick="switchTab('l1')">L1 캡챠 (이미지)</button>
   <button class="tab-btn" onclick="switchTab('l2')">L2 캡챠 (HandOCR)</button>
   <button class="tab-btn" onclick="switchTab('chat')">Chat AI (모더레이션)</button>
 </div>
 
-<!-- L1 탭 -->
+<!-- ══════════════ L1 탭 ══════════════ -->
 <div id="tab-l1" class="tab-content active">
   <div class="card">
     <canvas id="card-l1"></canvas>
@@ -281,7 +291,7 @@
   </div>
 </div>
 
-<!-- L2 탭 -->
+<!-- ══════════════ L2 탭 ══════════════ -->
 <div id="tab-l2" class="tab-content">
   <div class="card">
     <canvas id="card-l2"></canvas>
@@ -293,6 +303,7 @@
       <div class="input-wrap"><canvas class="input-border"></canvas>
         <input type="text" class="form-input mono" id="l2SaasKey" placeholder="발급받은 site_key를 입력해주세요.">
       </div>
+
     </div>
 
     <div class="form-group">
@@ -308,6 +319,7 @@
       <button class="inline-btn" style="background:#757575;" onclick="l2Reset()">초기화</button>
     </div>
 
+    <!-- 미션 표시 -->
     <div class="mission-box" id="missionBox" style="display:none;">
       <canvas class="mission-canvas"></canvas>
       <div class="mission-pose" id="missionPose"></div>
@@ -315,6 +327,7 @@
       <div class="mission-label">위 손 포즈를 취하고, 손 위에 위 문자가 보이도록 해주세요</div>
     </div>
 
+    <!-- 웹캠 -->
     <div class="video-wrap" id="videoWrap" style="display:none;">
       <canvas class="video-border"></canvas>
       <video id="l2Video" autoplay playsinline muted></video>
@@ -323,6 +336,7 @@
 
     <hr class="separator">
 
+    <!-- 이미지 업로드 방식 (웹캠 대안) -->
     <div id="uploadArea" style="display:none;">
       <label class="form-label" style="font-size:16px; margin-bottom:8px; display:block;">또는 이미지 직접 업로드</label>
       <div class="img-upload-row">
@@ -336,13 +350,14 @@
       <button class="main-btn" onclick="l2Verify()" id="l2VerifyBtn">검증 제출</button>
     </div>
 
+    <!-- 결과 -->
     <div id="l2Result" style="display:none; position:relative;">
       <canvas class="result-canvas"></canvas>
     </div>
   </div>
 </div>
 
-<!-- Chat AI 탭 -->
+<!-- ══════════════ Chat AI 탭 ══════════════ -->
 <div id="tab-chat" class="tab-content">
   <div class="card" style="width:500px;">
     <canvas id="card-chat"></canvas>
@@ -363,12 +378,14 @@
 
     <hr class="separator">
 
+    <!-- 채팅창 -->
     <div style="position:relative;">
       <div class="chat-messages" id="chatMessages">
         <canvas class="chat-border"></canvas>
       </div>
     </div>
 
+    <!-- 입력 -->
     <div class="chat-input-row" style="margin-top:8px;">
       <div class="chat-input-wrap">
         <canvas class="input-border"></canvas>
@@ -380,6 +397,7 @@
 
     <p class="form-hint" style="margin-top:8px;">테스트: "안녕하세요", "ㅋㅋ", "씨발", "저런 애들은 죽어야지"</p>
 
+    <!-- 빠른 테스트 버튼 -->
     <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
       <button class="inline-btn" style="font-size:14px; background:#4caf50;" onclick="quickChat('안녕하세요!')">정상</button>
       <button class="inline-btn" style="font-size:14px; background:#ff9800;" onclick="quickChat('ㅅㅂ 존나 짜증나')">경고</button>
@@ -389,9 +407,11 @@
   </div>
 </div>
 
+<!-- 토스트 -->
 <div class="toast toast-success" id="successToast">로그인 성공!</div>
 <div class="toast toast-error" id="errorToast"></div>
 
+<!-- 디버그 패널 -->
 <div class="debug-panel">
   <div class="debug-header">[SDK Debug]</div>
   <div class="debug-body" id="debugBody"><div>> waiting...</div></div>
@@ -405,6 +425,9 @@
 <script src="https://party-up.store/sdk/partyup-captcha.js" defer></script>
 
 <script>
+// ══════════════════════════════════════════
+// Rough.js UI
+// ══════════════════════════════════════════
 var R = 3.5;
 
 function drawRoughRect(el, opts) {
@@ -433,16 +456,20 @@ function fillBtn(id, disabled) {
 }
 
 function initRoughUI() {
+  // 헤더
   var hc = document.getElementById('header-bg');
   hc.width = hc.parentElement.offsetWidth; hc.height = hc.parentElement.offsetHeight;
   rough.canvas(hc).rectangle(0, 0, hc.width, hc.height, { stroke:'#333', strokeWidth:2.5, roughness:R, fill:'#fffde7', fillStyle:'solid' });
 
+  // 카드들
   fillCard('card-l1'); fillCard('card-l2'); fillCard('card-chat', '#fafaf8');
 
+  // input borders
   document.querySelectorAll('.input-border').forEach(function(c) {
     drawRoughRect(c, { fill:'#fafaf5', fillStyle:'solid', strokeWidth:2 });
   });
 
+  // captcha border
   var cap = document.querySelector('.captcha-border');
   if (cap) {
     cap.width = cap.parentElement.offsetWidth; cap.height = cap.parentElement.offsetHeight;
@@ -451,6 +478,7 @@ function initRoughUI() {
     });
   }
 
+  // 미션 박스
   document.querySelectorAll('.mission-canvas').forEach(function(c) {
     c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
     rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
@@ -458,6 +486,7 @@ function initRoughUI() {
     });
   });
 
+  // 비디오 border
   document.querySelectorAll('.video-border').forEach(function(c) {
     c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
     rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
@@ -465,6 +494,7 @@ function initRoughUI() {
     });
   });
 
+  // 채팅 border
   document.querySelectorAll('.chat-border').forEach(function(c) {
     c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
     rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
@@ -472,8 +502,10 @@ function initRoughUI() {
     });
   });
 
+  // 버튼들
   fillBtn('btn-l1', true); fillBtn('btn-l2', false);
 
+  // 결과 영역
   document.querySelectorAll('.result-canvas').forEach(function(c) {
     c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
     rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
@@ -481,6 +513,7 @@ function initRoughUI() {
     });
   });
 
+  // 푸터
   var fc = document.getElementById('footer-bg');
   fc.width = fc.parentElement.offsetWidth; fc.height = fc.parentElement.offsetHeight;
   rough.canvas(fc).line(0, 2, fc.width, 2, { stroke:'#ccc', strokeWidth:2, roughness:R });
@@ -502,6 +535,7 @@ function drawBgDoodles() {
 window.addEventListener('load', initRoughUI);
 window.addEventListener('resize', initRoughUI);
 
+// L1 버튼 상태 감시
 var _prevL1Disabled = null;
 setInterval(function() {
   var btn = document.getElementById('loginBtn');
@@ -512,6 +546,9 @@ setInterval(function() {
   }
 }, 300);
 
+// ══════════════════════════════════════════
+// 탭 전환
+// ══════════════════════════════════════════
 function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
@@ -520,6 +557,9 @@ function switchTab(name) {
   setTimeout(initRoughUI, 50);
 }
 
+// ══════════════════════════════════════════
+// 공통 유틸
+// ══════════════════════════════════════════
 var apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8000' : 'https://party-up.store';
 
@@ -539,7 +579,9 @@ function showToast(type, message) {
   setTimeout(function() { el.classList.remove('show'); }, 3500);
 }
 
-// L1
+// ══════════════════════════════════════════
+// L1 캡챠
+// ══════════════════════════════════════════
 var captchaToken = null;
 
 function applySiteKey() {
@@ -601,18 +643,21 @@ function initCaptcha() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCaptcha);
 else initCaptcha();
 
-// L2
+// ══════════════════════════════════════════
+// L2 HandOCR
+// ══════════════════════════════════════════
 var l2SessionId = null;
 var l2Stream = null;
 
 async function l2Start() {
   var saasKey = document.getElementById('l2SaasKey').value.trim();
   if (!saasKey) { showToast('error', 'API 키를 먼저 입력하세요'); return; }
-  debugLog('L2 start', apiBase);
+  var base = apiBase;
+  debugLog('L2 start', base);
   document.getElementById('l2StartBtn').disabled = true;
 
   try {
-    var res = await fetch(apiBase + '/api/saas/captcha/handocr/start', {
+    var res = await fetch(base + '/api/saas/captcha/handocr/start', {
       method: 'POST',
       headers: { 'X-Saas-Key': saasKey }
     });
@@ -630,6 +675,7 @@ async function l2Start() {
     debugLog('L2 pose', data.pose);
     debugLog('L2 text', data.text);
 
+    // 미션 표시
     document.getElementById('missionPose').textContent = data.pose;
     document.getElementById('missionText').textContent = data.text;
     document.getElementById('missionBox').style.display = 'block';
@@ -640,6 +686,7 @@ async function l2Start() {
 
     setTimeout(initRoughUI, 50);
 
+    // 웹캠 시작
     try {
       l2Stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' } });
       var vid = document.getElementById('l2Video');
@@ -662,13 +709,17 @@ async function l2Start() {
 
 async function l2Verify() {
   if (!l2SessionId) { showToast('error', '먼저 미션을 시작하세요'); return; }
+  var base = apiBase;
 
+  // 이미지 가져오기: 웹캠 캡처 or 파일 업로드
   var imageBlob = null;
+
   var fileInput = document.getElementById('l2ImageInput');
   if (fileInput.files && fileInput.files[0]) {
     imageBlob = fileInput.files[0];
     debugLog('L2 verify', '파일 업로드 방식');
   } else if (l2Stream) {
+    // 웹캠 캡처
     var vid = document.getElementById('l2Video');
     var tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = vid.videoWidth || 640;
@@ -690,16 +741,17 @@ async function l2Verify() {
 
   try {
     var saasKey = document.getElementById('l2SaasKey').value.trim();
-    var res = await fetch(apiBase + '/api/saas/captcha/handocr/verify', {
-      method: 'POST',
-      headers: { 'X-Saas-Key': saasKey },
-      body: form
-    });
+  var res = await fetch(base + '/api/saas/captcha/handocr/verify', {
+    method: 'POST',
+    headers: { 'X-Saas-Key': saasKey },
+    body: form
+  });
     var data = await res.json();
 
     var resultEl = document.getElementById('l2Result');
     resultEl.style.display = 'block';
 
+    // 결과 내용 초기화 (canvas 제외)
     var existingCanvas = resultEl.querySelector('canvas');
     resultEl.innerHTML = '';
     if (existingCanvas) resultEl.appendChild(existingCanvas);
@@ -712,7 +764,8 @@ async function l2Verify() {
     if (data.success) {
       debugLog('L2 PASS', '검증 성공', 'success');
       txt.className = 'result-success';
-      txt.innerHTML = '<b>검증 성공!</b><br>포즈: ' + (data.detectedPose||'-') + '<br>텍스트: ' + (data.detectedText||'-');
+      txt.innerHTML = '<b>검증 성공!</b><br>passToken: ' + (data.passToken ? data.passToken.substring(0,16) + '...' : '-');
+      debugLog('L2 passToken', data.passToken ? data.passToken.substring(0,16) + '...' : 'none', 'success');
       l2Stop();
 
       var secretKey = document.getElementById('l2SecretKey').value.trim();
@@ -779,7 +832,9 @@ function previewImage() {
   prev.style.display = 'block';
 }
 
-// Chat AI
+// ══════════════════════════════════════════
+// Chat AI 모더레이션
+// ══════════════════════════════════════════
 function appendBubble(text, cls, detail) {
   var container = document.getElementById('chatMessages');
   var wrap = document.createElement('div');
@@ -819,6 +874,7 @@ async function runChatCheck(msg) {
   var saasKey = document.getElementById('chatSaasKey').value.trim();
   var secretKey = document.getElementById('chatSecretKey').value.trim();
   if (!saasKey) { showToast('error', 'API 키를 먼저 입력하세요'); return; }
+  var base = apiBase;
 
   debugLog('Chat', '메시지: ' + msg);
 
@@ -826,7 +882,7 @@ async function runChatCheck(msg) {
   if (secretKey) headers['X-Saas-Secret'] = secretKey;
 
   try {
-    var res = await fetch(apiBase + '/api/saas/chat/check', {
+    var res = await fetch(base + '/api/saas/chat/check', {
       method: 'POST',
       headers: headers,
       body: JSON.stringify({ content: msg })
