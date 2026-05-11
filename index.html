@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TechCorp - 로그인</title>
+  <title>Party-Up SaaS - 테스트 데모</title>
   <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap');
@@ -17,7 +17,6 @@
       flex-direction: column;
     }
 
-    /* 헤더 - rough.js가 그림 */
     .header {
       position: relative;
       padding: 14px 24px;
@@ -27,538 +26,848 @@
       z-index: 1;
     }
     .header canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-    .header-logo {
-      font-size: 28px;
-      font-weight: 700;
-      color: #333;
-    }
+    .header-logo { font-size: 28px; font-weight: 700; color: #333; }
     .header-nav a {
-      color: #555;
-      text-decoration: none;
-      font-size: 20px;
-      margin-left: 20px;
+      color: #555; text-decoration: none; font-size: 20px; margin-left: 20px;
     }
 
-    /* 메인 */
-    .main {
-      flex: 1;
+    .tab-nav {
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 30px 16px;
+      gap: 12px;
+      padding: 20px 16px 0;
     }
+    .tab-btn {
+      font-family: 'Gaegu', cursive;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 8px 24px;
+      border: 3px solid #333;
+      background: #f5f5f5;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .tab-btn.active { background: #333; color: #fff; }
+    .tab-btn:hover:not(.active) { background: #e0e0e0; }
 
-    /* 로그인 카드 - canvas 위에 콘텐츠 */
-    .login-card {
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; justify-content: center; padding: 24px 16px 40px; }
+
+    .card {
       position: relative;
-      width: 400px;
+      width: 460px;
       padding: 40px 36px;
     }
-    .login-card canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
+    .card canvas {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
     }
+    .card-title { font-size: 32px; font-weight: 700; color: #333; margin-bottom: 4px; }
+    .card-sub { font-size: 16px; color: #999; margin-bottom: 24px; }
 
-    .login-title {
-      font-size: 38px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 4px;
-    }
-    .login-subtitle {
-      font-size: 18px;
-      color: #999;
-      margin-bottom: 24px;
-    }
-
-    /* 폼 - input은 투명, 밑에 canvas가 테두리 */
-    .form-group {
-      position: relative;
-      margin-bottom: 18px;
-    }
-    .form-label {
-      font-size: 20px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 4px;
-      display: block;
-    }
-    .input-wrap {
-      position: relative;
-      height: 44px;
-    }
-    .input-wrap canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
+    .form-group { position: relative; margin-bottom: 16px; }
+    .form-label { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; display: block; }
+    .form-label.small { font-size: 15px; color: #e91e63; }
+    .form-label.blue  { font-size: 15px; color: #4285f4; }
+    .input-wrap { position: relative; height: 44px; }
+    .input-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     .form-input {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      padding: 8px 12px;
-      border: none;
-      background: transparent;
-      font-size: 20px;
-      font-family: 'Gaegu', cursive;
-      color: #333;
-      outline: none;
+      position: relative; z-index: 1; width: 100%; height: 100%;
+      padding: 8px 12px; border: none; background: transparent;
+      font-size: 18px; font-family: 'Gaegu', cursive; color: #333; outline: none;
     }
+    .form-input.mono { font-size: 13px; font-family: 'Courier New', monospace; }
+    .form-hint { font-size: 13px; color: #999; margin-top: 4px; }
 
-    /* 캡챠 영역 */
+    .btn-wrap { position: relative; height: 52px; cursor: pointer; }
+    .btn-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .main-btn {
+      position: relative; z-index: 1; width: 100%; height: 100%;
+      border: none; background: transparent;
+      font-size: 24px; font-weight: 700; font-family: 'Gaegu', cursive;
+      color: #fff; cursor: pointer;
+    }
+    .main-btn:disabled { color: #aaa; cursor: not-allowed; }
+
+    .inline-btn {
+      margin-top: 6px; padding: 4px 14px;
+      font-family: 'Gaegu', cursive; font-size: 18px; font-weight: 700;
+      background: #e91e63; color: #fff; border: 2px solid #333; cursor: pointer;
+    }
+    .inline-btn.blue { background: #4285f4; }
+
     .captcha-area {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-      padding: 14px;
+      position: relative; display: flex; justify-content: center;
+      margin: 20px 0; padding: 14px;
     }
-    .captcha-area canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
+    .captcha-area canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+    .mission-box {
+      position: relative; padding: 18px 20px; margin: 16px 0; text-align: center;
+    }
+    .mission-box canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .mission-pose { font-size: 36px; margin-bottom: 4px; }
+    .mission-text { font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #333; }
+    .mission-label { font-size: 16px; color: #777; margin-top: 6px; }
+
+    .video-wrap {
+      position: relative; width: 100%; height: 220px; margin: 12px 0; overflow: hidden;
+    }
+    .video-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    #l2Video {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      object-fit: cover; transform: scaleX(-1); z-index: -1;
+    }
+    .video-placeholder {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #aaa;
     }
 
-    /* 버튼 */
-    .btn-wrap {
-      position: relative;
-      height: 52px;
-      cursor: pointer;
-    }
-    .btn-wrap canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
-    .login-btn {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: transparent;
-      font-size: 26px;
-      font-weight: 700;
-      font-family: 'Gaegu', cursive;
-      color: #fff;
-      cursor: pointer;
-    }
-    .login-btn:disabled {
-      color: #aaa;
-      cursor: not-allowed;
+    .img-upload-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .img-preview {
+      width: 100px; height: 80px; object-fit: cover; border: 2px dashed #ccc;
+      display: none;
     }
 
-    /* 하단 */
-    .login-footer {
-      text-align: center;
-      margin-top: 16px;
-      font-size: 18px;
-      color: #999;
+    #l2Result {
+      min-height: 60px; padding: 12px 14px; margin-top: 12px;
+      font-size: 18px; line-height: 1.5;
     }
-    .login-footer a { color: #e91e63; text-decoration: none; font-weight: 700; }
+    #l2Result canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .result-success { color: #1b5e20; }
+    .result-fail    { color: #b71c1c; }
+    .result-neutral { color: #333; }
 
-    /* 토스트 */
+    .chat-messages {
+      height: 240px; overflow-y: auto; padding: 12px;
+      margin: 16px 0; display: flex; flex-direction: column; gap: 8px;
+    }
+    .chat-messages canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .chat-bubble {
+      max-width: 80%; padding: 8px 12px; font-size: 18px; line-height: 1.4;
+      border: 2px solid #333;
+    }
+    .bubble-user  { align-self: flex-end; background: #e3f2fd; }
+    .bubble-ok    { align-self: flex-start; background: #e8f5e9; border-color: #388e3c; }
+    .bubble-warn  { align-self: flex-start; background: #fff9c4; border-color: #f9a825; }
+    .bubble-block { align-self: flex-start; background: #ffcdd2; border-color: #c62828; }
+    .bubble-stage { font-size: 12px; color: #999; margin-top: 2px; }
+
+    .chat-input-row { display: flex; gap: 8px; align-items: stretch; }
+    .chat-input-wrap { flex: 1; position: relative; height: 48px; }
+    .chat-input-wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .chat-input {
+      position: relative; z-index: 1; width: 100%; height: 100%;
+      padding: 8px 12px; border: none; background: transparent;
+      font-size: 18px; font-family: 'Gaegu', cursive; color: #333; outline: none;
+    }
+    .chat-send-btn {
+      padding: 0 20px; font-family: 'Gaegu', cursive; font-size: 18px; font-weight: 700;
+      background: #333; color: #fff; border: 2px solid #333; cursor: pointer;
+    }
+
+    .chat-settings { margin-bottom: 16px; }
+    .chat-settings-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .settings-label { font-size: 16px; color: #555; min-width: 90px; }
+    .settings-input {
+      flex: 1; padding: 4px 8px; border: 2px solid #ccc;
+      font-size: 14px; font-family: 'Courier New', monospace;
+    }
+
+    .debug-panel {
+      position: fixed; bottom: 12px; right: 12px; width: 300px;
+      background: #111; color: #0f0; border: 2px solid #0f0;
+      font-size: 11px; font-family: 'Courier New', monospace; z-index: 9999;
+    }
+    .debug-header { padding: 4px 8px; background: #001a00; border-bottom: 1px solid #0f0; font-weight: 700; }
+    .debug-body { padding: 4px 8px; max-height: 160px; overflow-y: auto; }
+    .debug-body div { padding: 1px 0; }
+    .val-success { color: #0f0; }
+    .val-error   { color: #f44; }
+    .val-warn    { color: #fa0; }
+
     .toast {
-      position: fixed;
-      top: 20px; right: 20px;
-      padding: 12px 20px;
-      font-size: 20px;
-      font-family: 'Gaegu', cursive;
-      font-weight: 700;
-      border: 3px solid #333;
-      transform: translateX(150%);
-      transition: transform 0.3s;
-      z-index: 100000;
+      position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+      font-size: 20px; font-family: 'Gaegu', cursive; font-weight: 700;
+      border: 3px solid #333; transform: translateX(150%); transition: transform 0.3s; z-index: 100000;
     }
     .toast.show { transform: translateX(0); }
     .toast-success { background: #c8e6c9; color: #1b5e20; }
-    .toast-error { background: #ffcdd2; color: #b71c1c; }
+    .toast-error   { background: #ffcdd2; color: #b71c1c; }
 
-    /* 디버그 */
-    .debug-panel {
-      position: fixed;
-      bottom: 12px; right: 12px;
-      width: 280px;
-      background: #111;
-      color: #0f0;
-      border: 2px solid #0f0;
-      font-size: 11px;
-      font-family: 'Courier New', monospace;
-    }
-    .debug-header {
-      padding: 4px 8px;
-      background: #001a00;
-      border-bottom: 1px solid #0f0;
-      font-weight: 700;
-    }
-    .debug-body {
-      padding: 4px 8px;
-      max-height: 140px;
-      overflow-y: auto;
-    }
-    .debug-body div { padding: 1px 0; }
-    .debug-body .val-success { color: #0f0; }
-    .debug-body .val-error { color: #f44; }
-
-    /* 푸터 */
     .page-footer {
-      position: relative;
-      text-align: center;
-      padding: 12px;
-      font-size: 16px;
-      color: #aaa;
+      position: relative; text-align: center; padding: 12px;
+      font-size: 16px; color: #aaa; margin-top: auto;
     }
-    .page-footer canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-    }
+    .page-footer canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-    /* 배경 낙서 캔버스 */
-    #bg-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: -2;
-    }
+    #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -2; }
+
+    .separator { border: none; border-top: 2px dashed #ddd; margin: 16px 0; }
   </style>
 </head>
 <body>
 
-  <canvas id="bg-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 
-  <!-- 헤더 -->
-  <header class="header">
-    <canvas id="header-bg"></canvas>
-    <div class="header-logo">TechCorp</div>
-    <nav class="header-nav">
-      <a href="#">제품</a>
-      <a href="#">가격</a>
-      <a href="#">문서</a>
-      <a href="#">지원</a>
-    </nav>
-  </header>
+<header class="header">
+  <canvas id="header-bg"></canvas>
+  <div class="header-logo">TechCorp</div>
+  <nav class="header-nav">
+    <a href="#">제품</a>
+    <a href="#">가격</a>
+    <a href="#">문서</a>
+    <a href="#">지원</a>
+  </nav>
+</header>
 
-  <!-- 로그인 카드 -->
-  <main class="main">
-    <div class="login-card">
-      <canvas id="card-bg"></canvas>
-      <h1 class="login-title">로그인</h1>
-      <p class="login-subtitle">TechCorp 계정으로 로그인하세요.</p>
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('l1')">L1 캡챠 (이미지)</button>
+  <button class="tab-btn" onclick="switchTab('l2')">L2 캡챠 (HandOCR)</button>
+  <button class="tab-btn" onclick="switchTab('chat')">Chat AI (모더레이션)</button>
+</div>
 
-      <!-- SaaS API 키 입력 영역 -->
-      <div class="form-group" id="apiKeyGroup">
-        <label class="form-label" style="font-size:16px; color:#e91e63;">Party-Up API Key (SaaS)</label>
-        <div class="input-wrap">
-          <canvas class="input-border"></canvas>
-          <input type="text" class="form-input" id="apiKeyInput" placeholder="발급 받은 site_key를 입력해주세요."  style="font-size:14px; font-family: 'Courier New', monospace;">
-        </div>
-        <button onclick="applySiteKey()" style="margin-top:6px; padding:4px 14px; font-family:'Gaegu',cursive; font-size:18px; font-weight:700; background:#e91e63; color:#fff; border:2px solid #333; cursor:pointer; border-radius:0;">캡챠 로드</button>
+<!-- L1 탭 -->
+<div id="tab-l1" class="tab-content active">
+  <div class="card">
+    <canvas id="card-l1"></canvas>
+    <h1 class="card-title">로그인</h1>
+    <p class="card-sub">L1 GAN 이미지 캡챠 테스트</p>
+
+    <div class="form-group">
+      <label class="form-label small">Party-Up API Key (SaaS)</label>
+      <div class="input-wrap"><canvas class="input-border"></canvas>
+        <input type="text" class="form-input mono" id="apiKeyInput" placeholder="발급 받은 site_key를 입력해주세요.">
       </div>
-
-      <!-- Secret Key 입력 (서버 검증 시뮬레이션) -->
-      <div class="form-group" id="secretKeyGroup">
-        <label class="form-label" style="font-size:16px; color:#4285f4;">Secret Key (서버 검증 시뮬레이션)</label>
-        <div class="input-wrap">
-          <canvas class="input-border"></canvas>
-          <input type="text" class="form-input" id="secretKeyInput" placeholder="발급 받은 secret_key를 입력해주세요." style="font-size:14px; font-family: 'Courier New', monospace;">
-        </div>
-        <p style="font-size:14px; color:#999; margin-top:4px;">※ 실제 서비스에서는 파트너 백엔드 서버에서 호출합니다.</p>
-      </div>
-
-      <form id="loginForm" onsubmit="return false;">
-        <div class="form-group">
-          <label class="form-label">이메일</label>
-          <div class="input-wrap">
-            <canvas class="input-border"></canvas>
-            <input type="email" class="form-input" placeholder="user@techcorp.com" value="demo@techcorp.com">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">비밀번호</label>
-          <div class="input-wrap">
-            <canvas class="input-border"></canvas>
-            <input type="password" class="form-input" placeholder="비밀번호" value="password123">
-          </div>
-        </div>
-
-        <div class="captcha-area">
-          <canvas class="captcha-border"></canvas>
-          <div id="partyup-captcha"></div>
-        </div>
-
-        <div class="btn-wrap">
-          <canvas id="btn-bg"></canvas>
-          <button type="submit" class="login-btn" id="loginBtn" disabled>로그인</button>
-        </div>
-      </form>
-
-      <div class="login-footer">
-        계정이 없으신가요? <a href="#">회원가입</a>
-      </div>
+      <button class="inline-btn" onclick="applySiteKey()">캡챠 로드</button>
     </div>
-  </main>
 
-  <!-- 토스트 -->
-  <div class="toast toast-success" id="successToast">로그인 성공!</div>
-  <div class="toast toast-error" id="errorToast"></div>
+    <div class="form-group">
+      <label class="form-label blue">Secret Key (서버 검증 시뮬레이션)</label>
+      <div class="input-wrap"><canvas class="input-border"></canvas>
+        <input type="text" class="form-input mono" id="secretKeyInput" placeholder="발급 받은 secret_key를 입력해주세요.">
+      </div>
+      <p class="form-hint">※ 실제 서비스에서는 파트너 백엔드 서버에서 호출합니다.</p>
+    </div>
 
-  <!-- 디버그 -->
-  <div class="debug-panel">
-    <div class="debug-header">[SDK Debug]</div>
-    <div class="debug-body" id="debugBody">
-      <div>> waiting...</div>
+    <form id="loginForm" onsubmit="return false;">
+      <div class="form-group">
+        <label class="form-label">이메일</label>
+        <div class="input-wrap"><canvas class="input-border"></canvas>
+          <input type="email" class="form-input" placeholder="user@techcorp.com" value="demo@techcorp.com">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <div class="input-wrap"><canvas class="input-border"></canvas>
+          <input type="password" class="form-input" placeholder="비밀번호" value="password123">
+        </div>
+      </div>
+
+      <div class="captcha-area">
+        <canvas class="captcha-border"></canvas>
+        <div id="partyup-captcha"></div>
+      </div>
+
+      <div class="btn-wrap">
+        <canvas id="btn-l1"></canvas>
+        <button type="submit" class="main-btn" id="loginBtn" disabled>로그인</button>
+      </div>
+    </form>
+
+    <div style="text-align:center; margin-top:16px; font-size:18px; color:#999;">
+      계정이 없으신가요? <a href="#" style="color:#e91e63; font-weight:700;">회원가입</a>
     </div>
   </div>
+</div>
 
-  <!-- 푸터 -->
-  <footer class="page-footer">
-    <canvas id="footer-bg"></canvas>
-    © 2026 TechCorp — Party-Up CAPTCHA 데모
-  </footer>
+<!-- L2 탭 -->
+<div id="tab-l2" class="tab-content">
+  <div class="card">
+    <canvas id="card-l2"></canvas>
+    <h1 class="card-title">L2 HandOCR</h1>
+    <p class="card-sub">손 포즈 + 랜덤 문자열 실시간 검증</p>
 
-  <!-- ── 모든 UI를 rough.js로 그리기 ── -->
-  <script>
-    var R = 3.5;  // roughness — 높을수록 삐뚤
+    <div class="form-group">
+      <label class="form-label small">Party-Up API Key (SaaS L2)</label>
+      <div class="input-wrap"><canvas class="input-border"></canvas>
+        <input type="text" class="form-input mono" id="l2SaasKey" placeholder="발급받은 site_key를 입력해주세요.">
+      </div>
+    </div>
 
-    function drawRoughRect(canvasEl, opts) {
-      var w = canvasEl.parentElement.offsetWidth;
-      var h = canvasEl.parentElement.offsetHeight;
-      canvasEl.width = w;
-      canvasEl.height = h;
-      var rc = rough.canvas(canvasEl);
-      var o = Object.assign({ stroke: '#333', strokeWidth: 2, roughness: R }, opts || {});
-      rc.rectangle(2, 2, w - 4, h - 4, o);
-    }
+    <div class="form-group">
+      <label class="form-label blue">Secret Key (서버 검증 시뮬레이션)</label>
+      <div class="input-wrap"><canvas class="input-border"></canvas>
+        <input type="text" class="form-input mono" id="l2SecretKey" placeholder="발급받은 secret_key를 입력해주세요.">
+      </div>
+      <p class="form-hint">※ 실제 서비스에서는 파트너 백엔드 서버에서 호출합니다.</p>
+    </div>
 
-    function initRoughUI() {
-      // 헤더 배경
-      var hc = document.getElementById('header-bg');
-      hc.width = hc.parentElement.offsetWidth;
-      hc.height = hc.parentElement.offsetHeight;
-      var rc = rough.canvas(hc);
-      rc.rectangle(0, 0, hc.width, hc.height, {
-        stroke: '#333', strokeWidth: 2.5, roughness: R,
-        fill: '#fffde7', fillStyle: 'solid'
+    <div style="display:flex; gap:8px; margin-bottom:16px;">
+      <button class="inline-btn" onclick="l2Start()" id="l2StartBtn">미션 시작</button>
+      <button class="inline-btn" style="background:#757575;" onclick="l2Reset()">초기화</button>
+    </div>
+
+    <div class="mission-box" id="missionBox" style="display:none;">
+      <canvas class="mission-canvas"></canvas>
+      <div class="mission-pose" id="missionPose"></div>
+      <div class="mission-text" id="missionText"></div>
+      <div class="mission-label">위 손 포즈를 취하고, 손 위에 위 문자가 보이도록 해주세요</div>
+    </div>
+
+    <div class="video-wrap" id="videoWrap" style="display:none;">
+      <canvas class="video-border"></canvas>
+      <video id="l2Video" autoplay playsinline muted></video>
+      <div class="video-placeholder" id="videoPlaceholder">카메라 접근 중...</div>
+    </div>
+
+    <hr class="separator">
+
+    <div id="uploadArea" style="display:none;">
+      <label class="form-label" style="font-size:16px; margin-bottom:8px; display:block;">또는 이미지 직접 업로드</label>
+      <div class="img-upload-row">
+        <input type="file" id="l2ImageInput" accept="image/*" style="font-size:14px; flex:1;" onchange="previewImage()">
+        <img id="imgPreview" class="img-preview" alt="preview">
+      </div>
+    </div>
+
+    <div class="btn-wrap" id="l2VerifyBtnWrap" style="display:none; margin-top:8px;">
+      <canvas id="btn-l2"></canvas>
+      <button class="main-btn" onclick="l2Verify()" id="l2VerifyBtn">검증 제출</button>
+    </div>
+
+    <div id="l2Result" style="display:none; position:relative;">
+      <canvas class="result-canvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Chat AI 탭 -->
+<div id="tab-chat" class="tab-content">
+  <div class="card" style="width:500px;">
+    <canvas id="card-chat"></canvas>
+    <h1 class="card-title">Chat AI</h1>
+    <p class="card-sub">Ollama 3단계 모더레이션 파이프라인 테스트</p>
+
+    <div class="chat-settings">
+      <div class="chat-settings-row">
+        <span class="settings-label" style="color:#e91e63; font-weight:700;">API Key</span>
+        <input type="text" class="settings-input" id="chatSaasKey" placeholder="발급받은 site_key를 입력해주세요.">
+      </div>
+      <div class="chat-settings-row">
+        <span class="settings-label" style="color:#4285f4; font-weight:700;">Secret Key</span>
+        <input type="text" class="settings-input" id="chatSecretKey" placeholder="발급받은 secret_key를 입력해주세요.">
+      </div>
+      <p class="form-hint" style="margin-top:0;">※ 실제 서비스에서는 파트너 백엔드 서버에서 Secret Key로 호출합니다.</p>
+    </div>
+
+    <hr class="separator">
+
+    <div style="position:relative;">
+      <div class="chat-messages" id="chatMessages">
+        <canvas class="chat-border"></canvas>
+      </div>
+    </div>
+
+    <div class="chat-input-row" style="margin-top:8px;">
+      <div class="chat-input-wrap">
+        <canvas class="input-border"></canvas>
+        <input type="text" class="chat-input" id="chatInput" placeholder="채팅 메시지를 입력하세요..."
+          onkeydown="if(event.key==='Enter' && !event.isComposing) sendChat()">
+      </div>
+      <button class="chat-send-btn" onclick="sendChat()">전송</button>
+    </div>
+
+    <p class="form-hint" style="margin-top:8px;">테스트: "안녕하세요", "ㅋㅋ", "씨발", "저런 애들은 죽어야지"</p>
+
+    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
+      <button class="inline-btn" style="font-size:14px; background:#4caf50;" onclick="quickChat('안녕하세요!')">정상</button>
+      <button class="inline-btn" style="font-size:14px; background:#ff9800;" onclick="quickChat('ㅅㅂ 존나 짜증나')">경고</button>
+      <button class="inline-btn" style="font-size:14px; background:#f44336;" onclick="quickChat('저런 애들은 다 죽어야지')">차단</button>
+      <button class="inline-btn" style="font-size:14px; background:#757575;" onclick="clearChat()">채팅 초기화</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast toast-success" id="successToast">로그인 성공!</div>
+<div class="toast toast-error" id="errorToast"></div>
+
+<div class="debug-panel">
+  <div class="debug-header">[SDK Debug]</div>
+  <div class="debug-body" id="debugBody"><div>> waiting...</div></div>
+</div>
+
+<footer class="page-footer">
+  <canvas id="footer-bg"></canvas>
+  © 2026 TechCorp — Party-Up CAPTCHA 데모 (L1 / L2 / Chat AI)
+</footer>
+
+<script src="https://party-up.store/sdk/partyup-captcha.js" defer></script>
+
+<script>
+var R = 3.5;
+
+function drawRoughRect(el, opts) {
+  var w = el.parentElement.offsetWidth, h = el.parentElement.offsetHeight;
+  el.width = w; el.height = h;
+  rough.canvas(el).rectangle(2, 2, w-4, h-4, Object.assign({ stroke:'#333', strokeWidth:2, roughness:R }, opts||{}));
+}
+
+function fillCard(id, fillColor) {
+  var c = document.getElementById(id);
+  if (!c) return;
+  c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
+  var rc = rough.canvas(c);
+  rc.rectangle(3, 3, c.width-6, c.height-6, { stroke:'#333', strokeWidth:3, roughness:R, fill: fillColor||'#fff', fillStyle:'solid' });
+  rc.line(10, c.height-1, c.width+3, c.height-1, { stroke:'#bbb', strokeWidth:3, roughness:R });
+  rc.line(c.width-1, 10, c.width-1, c.height+3, { stroke:'#bbb', strokeWidth:3, roughness:R });
+}
+
+function fillBtn(id, disabled) {
+  var bc = document.getElementById(id); if (!bc) return;
+  bc.width = bc.parentElement.offsetWidth; bc.height = bc.parentElement.offsetHeight;
+  rough.canvas(bc).rectangle(2, 2, bc.width-4, bc.height-4, {
+    stroke:'#333', strokeWidth:3, roughness:R,
+    fill: disabled ? '#ccc' : '#4285f4', fillStyle:'solid'
+  });
+}
+
+function initRoughUI() {
+  var hc = document.getElementById('header-bg');
+  hc.width = hc.parentElement.offsetWidth; hc.height = hc.parentElement.offsetHeight;
+  rough.canvas(hc).rectangle(0, 0, hc.width, hc.height, { stroke:'#333', strokeWidth:2.5, roughness:R, fill:'#fffde7', fillStyle:'solid' });
+
+  fillCard('card-l1'); fillCard('card-l2'); fillCard('card-chat', '#fafaf8');
+
+  document.querySelectorAll('.input-border').forEach(function(c) {
+    drawRoughRect(c, { fill:'#fafaf5', fillStyle:'solid', strokeWidth:2 });
+  });
+
+  var cap = document.querySelector('.captcha-border');
+  if (cap) {
+    cap.width = cap.parentElement.offsetWidth; cap.height = cap.parentElement.offsetHeight;
+    rough.canvas(cap).rectangle(2, 2, cap.width-4, cap.height-4, {
+      stroke:'#999', strokeWidth:1.5, roughness:R, strokeLineDash:[8,6], fill:'#f9f9f0', fillStyle:'solid'
+    });
+  }
+
+  document.querySelectorAll('.mission-canvas').forEach(function(c) {
+    c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
+    rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
+      stroke:'#4285f4', strokeWidth:2.5, roughness:R, fill:'#e8f0fe', fillStyle:'solid'
+    });
+  });
+
+  document.querySelectorAll('.video-border').forEach(function(c) {
+    c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
+    rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
+      stroke:'#333', strokeWidth:2, roughness:R, fill:'#000', fillStyle:'solid'
+    });
+  });
+
+  document.querySelectorAll('.chat-border').forEach(function(c) {
+    c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
+    rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
+      stroke:'#ccc', strokeWidth:1.5, roughness:R, fill:'#fafaf8', fillStyle:'solid'
+    });
+  });
+
+  fillBtn('btn-l1', true); fillBtn('btn-l2', false);
+
+  document.querySelectorAll('.result-canvas').forEach(function(c) {
+    c.width = c.parentElement.offsetWidth; c.height = c.parentElement.offsetHeight;
+    rough.canvas(c).rectangle(2, 2, c.width-4, c.height-4, {
+      stroke:'#ccc', strokeWidth:1.5, roughness:R, fill:'#f9f9f0', fillStyle:'solid'
+    });
+  });
+
+  var fc = document.getElementById('footer-bg');
+  fc.width = fc.parentElement.offsetWidth; fc.height = fc.parentElement.offsetHeight;
+  rough.canvas(fc).line(0, 2, fc.width, 2, { stroke:'#ccc', strokeWidth:2, roughness:R });
+
+  drawBgDoodles();
+}
+
+function drawBgDoodles() {
+  var c = document.getElementById('bg-canvas');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  var rc = rough.canvas(c), w = c.width, h = c.height;
+  rc.circle(80, 200, 50, { stroke:'#e0e0e0', strokeWidth:1.5, roughness:4 });
+  rc.circle(w-100, 180, 35, { stroke:'#eee', strokeWidth:1, roughness:4 });
+  rc.line(40, h-100, 150, h-120, { stroke:'#e8e8e8', strokeWidth:2, roughness:4 });
+  rc.rectangle(w-180, h-200, 60, 40, { stroke:'#eee', strokeWidth:1.5, roughness:4 });
+  rc.line(160, 120, 230, 100, { stroke:'#ddd', strokeWidth:2, roughness:3 });
+}
+
+window.addEventListener('load', initRoughUI);
+window.addEventListener('resize', initRoughUI);
+
+var _prevL1Disabled = null;
+setInterval(function() {
+  var btn = document.getElementById('loginBtn');
+  if (!btn) return;
+  if (btn.disabled !== _prevL1Disabled) {
+    _prevL1Disabled = btn.disabled;
+    fillBtn('btn-l1', btn.disabled);
+  }
+}, 300);
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  setTimeout(initRoughUI, 50);
+}
+
+var apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000' : 'https://party-up.store';
+
+function debugLog(key, value, type) {
+  var body = document.getElementById('debugBody');
+  var div = document.createElement('div');
+  var cls = type === 'success' ? 'val-success' : type === 'error' ? 'val-error' : type === 'warn' ? 'val-warn' : '';
+  div.innerHTML = '<span style="color:#888;">> </span><span class="' + cls + '">' + key + ': ' + value + '</span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showToast(type, message) {
+  var el = type === 'success' ? document.getElementById('successToast') : document.getElementById('errorToast');
+  if (type === 'error' && message) el.textContent = message;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 3500);
+}
+
+// L1
+var captchaToken = null;
+
+function applySiteKey() {
+  var key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) { showToast('error', 'API 키를 입력하세요'); return; }
+  debugLog('siteKey', key);
+  document.getElementById('partyup-captcha').innerHTML = '';
+  captchaToken = null;
+  document.getElementById('loginBtn').disabled = true;
+  loadCaptcha(key);
+}
+
+function loadCaptcha(siteKey) {
+  if (typeof PartyUpCaptcha === 'undefined') { setTimeout(function() { loadCaptcha(siteKey); }, 100); return; }
+  debugLog('init', 'SDK v' + PartyUpCaptcha.version);
+  PartyUpCaptcha.render('#partyup-captcha', {
+    siteKey: siteKey, apiBase: apiBase, triggerType: 'new_ip_login',
+    onSuccess: function(token) {
+      captchaToken = token;
+      document.getElementById('loginBtn').disabled = false;
+      debugLog('L1 PASS', 'token OK', 'success');
+    },
+    onError: function(msg) { debugLog('L1 ERR', msg, 'error'); }
+  });
+  debugLog('status', 'rendering captcha...');
+}
+
+function initCaptcha() {
+  var key = document.getElementById('apiKeyInput').value.trim();
+  if (key) loadCaptcha(key);
+
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!captchaToken) { showToast('error', '캡챠를 먼저 완료해주세요'); return; }
+    var secretKey = document.getElementById('secretKeyInput').value.trim();
+    if (!secretKey) { debugLog('login', 'OK (서버 검증 생략)', 'success'); showToast('success'); return; }
+    debugLog('siteverify', '서버 검증 요청 중...');
+    try {
+      var res = await fetch(apiBase + '/api/captcha/siteverify', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret: secretKey, response: captchaToken })
       });
-
-      // 로그인 카드
-      var cc = document.getElementById('card-bg');
-      cc.width = cc.parentElement.offsetWidth;
-      cc.height = cc.parentElement.offsetHeight;
-      rc = rough.canvas(cc);
-      rc.rectangle(3, 3, cc.width - 6, cc.height - 6, {
-        stroke: '#333', strokeWidth: 3, roughness: R,
-        fill: '#fff', fillStyle: 'solid'
-      });
-      // 그림자 느낌 — 오른쪽 아래에 한 줄 더
-      rc.line(10, cc.height - 1, cc.width + 3, cc.height - 1, { stroke: '#bbb', strokeWidth: 3, roughness: R });
-      rc.line(cc.width - 1, 10, cc.width - 1, cc.height + 3, { stroke: '#bbb', strokeWidth: 3, roughness: R });
-
-      // input 테두리
-      document.querySelectorAll('.input-border').forEach(function(c) {
-        drawRoughRect(c, { fill: '#fafaf5', fillStyle: 'solid', strokeWidth: 2 });
-      });
-
-      // 캡챠 영역 — 점선
-      var cap = document.querySelector('.captcha-border');
-      cap.width = cap.parentElement.offsetWidth;
-      cap.height = cap.parentElement.offsetHeight;
-      rc = rough.canvas(cap);
-      rc.rectangle(2, 2, cap.width - 4, cap.height - 4, {
-        stroke: '#999', strokeWidth: 1.5, roughness: R,
-        strokeLineDash: [8, 6],
-        fill: '#f9f9f0', fillStyle: 'solid'
-      });
-
-      // 버튼
-      var btn = document.getElementById('btn-bg');
-      btn.width = btn.parentElement.offsetWidth;
-      btn.height = btn.parentElement.offsetHeight;
-      rc = rough.canvas(btn);
-      rc.rectangle(2, 2, btn.width - 4, btn.height - 4, {
-        stroke: '#333', strokeWidth: 3, roughness: R,
-        fill: '#4285f4', fillStyle: 'solid'
-      });
-
-      // 푸터
-      var fc = document.getElementById('footer-bg');
-      fc.width = fc.parentElement.offsetWidth;
-      fc.height = fc.parentElement.offsetHeight;
-      rc = rough.canvas(fc);
-      rc.line(0, 2, fc.width, 2, { stroke: '#ccc', strokeWidth: 2, roughness: R });
-
-      // 배경 낙서
-      drawBgDoodles();
-    }
-
-    function drawBgDoodles() {
-      var c = document.getElementById('bg-canvas');
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
-      var rc = rough.canvas(c);
-      var w = c.width, h = c.height;
-
-      // 흩어진 낙서들
-      rc.circle(80, 200, 50, { stroke: '#e0e0e0', strokeWidth: 1.5, roughness: 4 });
-      rc.circle(w - 100, 180, 35, { stroke: '#eee', strokeWidth: 1, roughness: 4 });
-      rc.line(40, h - 100, 150, h - 120, { stroke: '#e8e8e8', strokeWidth: 2, roughness: 4 });
-      rc.rectangle(w - 180, h - 200, 60, 40, { stroke: '#eee', strokeWidth: 1.5, roughness: 4 });
-
-      // 화살표
-      rc.line(160, 120, 230, 100, { stroke: '#ddd', strokeWidth: 2, roughness: 3 });
-      rc.line(220, 95, 230, 100, { stroke: '#ddd', strokeWidth: 2, roughness: 3 });
-      rc.line(224, 108, 230, 100, { stroke: '#ddd', strokeWidth: 2, roughness: 3 });
-
-      // 별
-      rc.polygon([
-        [w-60, 80], [w-53, 95], [w-38, 98], [w-48, 108],
-        [w-46, 123], [w-60, 115], [w-74, 123], [w-72, 108],
-        [w-82, 98], [w-67, 95]
-      ], { stroke: '#eee', strokeWidth: 1, roughness: 3 });
-    }
-
-    // DOM 준비 후 그리기
-    window.addEventListener('load', initRoughUI);
-    window.addEventListener('resize', initRoughUI);
-
-    // 버튼 상태 변경 시 색 다시 그리기
-    var _origDisabled = null;
-    setInterval(function() {
-      var btn = document.getElementById('loginBtn');
-      if (btn.disabled !== _origDisabled) {
-        _origDisabled = btn.disabled;
-        var bc = document.getElementById('btn-bg');
-        bc.width = bc.parentElement.offsetWidth;
-        bc.height = bc.parentElement.offsetHeight;
-        var rc = rough.canvas(bc);
-        rc.rectangle(2, 2, bc.width - 4, bc.height - 4, {
-          stroke: '#333', strokeWidth: 3, roughness: R,
-          fill: btn.disabled ? '#ccc' : '#4285f4', fillStyle: 'solid'
-        });
+      var data = await res.json();
+      if (data.success) {
+        debugLog('siteverify', 'SUCCESS (score: ' + (data.score||'-') + ')', 'success');
+        showToast('success');
+      } else {
+        var errMsg = (data.error_codes||[]).join(', ') || '검증 실패';
+        debugLog('siteverify', 'FAIL: ' + errMsg, 'error');
+        showToast('error', '서버 검증 실패: ' + errMsg);
       }
-    }, 300);
-  </script>
+    } catch(err) {
+      debugLog('siteverify', 'ERROR: ' + err.message, 'error');
+      showToast('error', '서버 검증 요청 실패: ' + err.message);
+    }
+  });
+}
 
-  <!-- SDK -->
-  <script defer src="https://party-up.store/sdk/partyup-captcha.js"></script>
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCaptcha);
+else initCaptcha();
 
-  <script>
-    function debugLog(key, value, type) {
-      var body = document.getElementById('debugBody');
-      var div = document.createElement('div');
-      var cls = type === 'success' ? 'val-success' : type === 'error' ? 'val-error' : '';
-      div.innerHTML = '<span style="color:#888;">> </span><span class="' + cls + '">' + key + ': ' + value + '</span>';
-      body.appendChild(div);
-      body.scrollTop = body.scrollHeight;
+// L2
+var l2SessionId = null;
+var l2Stream = null;
+
+async function l2Start() {
+  var saasKey = document.getElementById('l2SaasKey').value.trim();
+  if (!saasKey) { showToast('error', 'API 키를 먼저 입력하세요'); return; }
+  debugLog('L2 start', apiBase);
+  document.getElementById('l2StartBtn').disabled = true;
+
+  try {
+    var res = await fetch(apiBase + '/api/saas/captcha/handocr/start', {
+      method: 'POST',
+      headers: { 'X-Saas-Key': saasKey }
+    });
+    var data = await res.json();
+
+    if (!data.success) {
+      debugLog('L2', data.message || '시작 실패', 'error');
+      showToast('error', data.message || 'L2 시작 실패');
+      document.getElementById('l2StartBtn').disabled = false;
+      return;
     }
 
-    function showToast(type, message) {
-      var el = type === 'success' ? document.getElementById('successToast') : document.getElementById('errorToast');
-      if (type === 'error') el.textContent = message;
-      el.classList.add('show');
-      setTimeout(function () { el.classList.remove('show'); }, 4000);
+    l2SessionId = data.sessionId;
+    debugLog('L2 session', l2SessionId.substring(0,8) + '...', 'success');
+    debugLog('L2 pose', data.pose);
+    debugLog('L2 text', data.text);
+
+    document.getElementById('missionPose').textContent = data.pose;
+    document.getElementById('missionText').textContent = data.text;
+    document.getElementById('missionBox').style.display = 'block';
+    document.getElementById('videoWrap').style.display = 'block';
+    document.getElementById('uploadArea').style.display = 'block';
+    document.getElementById('l2VerifyBtnWrap').style.display = 'block';
+    document.getElementById('l2Result').style.display = 'none';
+
+    setTimeout(initRoughUI, 50);
+
+    try {
+      l2Stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' } });
+      var vid = document.getElementById('l2Video');
+      vid.srcObject = l2Stream;
+      document.getElementById('videoPlaceholder').style.display = 'none';
+    } catch(camErr) {
+      debugLog('L2 cam', '카메라 없음 - 이미지 업로드 사용', 'warn');
+      document.getElementById('videoPlaceholder').textContent = '카메라 없음 - 아래 이미지 업로드 사용';
     }
 
-    var captchaToken = null;
-    var apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:8000'
-      : 'https://party-up.store';
+    fillBtn('btn-l2', false);
 
-    function applySiteKey() {
-      var key = document.getElementById('apiKeyInput').value.trim();
-      if (!key) { showToast('error', 'API 키를 입력하세요'); return; }
-      debugLog('siteKey', key);
+  } catch(err) {
+    debugLog('L2', 'ERROR: ' + err.message, 'error');
+    showToast('error', 'L2 시작 실패: ' + err.message);
+  }
 
-      // 기존 캡챠 초기화
-      var container = document.getElementById('partyup-captcha');
-      container.innerHTML = '';
-      captchaToken = null;
-      document.getElementById('loginBtn').disabled = true;
+  document.getElementById('l2StartBtn').disabled = false;
+}
 
-      loadCaptcha(key);
-    }
+async function l2Verify() {
+  if (!l2SessionId) { showToast('error', '먼저 미션을 시작하세요'); return; }
 
-    function loadCaptcha(siteKey) {
-      if (typeof PartyUpCaptcha === 'undefined') {
-        setTimeout(function() { loadCaptcha(siteKey); }, 100);
-        return;
-      }
-      debugLog('init', 'SDK v' + PartyUpCaptcha.version);
+  var imageBlob = null;
+  var fileInput = document.getElementById('l2ImageInput');
+  if (fileInput.files && fileInput.files[0]) {
+    imageBlob = fileInput.files[0];
+    debugLog('L2 verify', '파일 업로드 방식');
+  } else if (l2Stream) {
+    var vid = document.getElementById('l2Video');
+    var tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = vid.videoWidth || 640;
+    tmpCanvas.height = vid.videoHeight || 480;
+    tmpCanvas.getContext('2d').drawImage(vid, 0, 0);
+    imageBlob = await new Promise(function(res) { tmpCanvas.toBlob(res, 'image/jpeg', 0.9); });
+    debugLog('L2 verify', '웹캠 캡처 방식');
+  } else {
+    showToast('error', '이미지를 업로드하거나 카메라를 허용해주세요');
+    return;
+  }
 
-      PartyUpCaptcha.render('#partyup-captcha', {
-        siteKey: siteKey,
-        apiBase: apiBase,
-        triggerType: 'new_ip_login',
-        onSuccess: function (token) {
-          captchaToken = token;
-          document.getElementById('loginBtn').disabled = false;
-          debugLog('PASS', 'token OK', 'success');
-        },
-        onError: function (message) {
-          debugLog('ERR', message, 'error');
-        }
-      });
-      debugLog('status', 'rendering captcha...');
-    }
+  var form = new FormData();
+  form.append('sessionId', l2SessionId);
+  form.append('image', imageBlob, 'capture.jpg');
 
-    // 페이지 로드 시 자동 로드
-    function initCaptcha() {
-      var key = document.getElementById('apiKeyInput').value.trim();
-      if (key) loadCaptcha(key);
+  debugLog('L2 verify', '제출 중...');
+  fillBtn('btn-l2', true);
 
-      document.getElementById('loginForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        if (!captchaToken) { showToast('error', '캡챠를 먼저 완료해주세요'); return; }
+  try {
+    var saasKey = document.getElementById('l2SaasKey').value.trim();
+    var res = await fetch(apiBase + '/api/saas/captcha/handocr/verify', {
+      method: 'POST',
+      headers: { 'X-Saas-Key': saasKey },
+      body: form
+    });
+    var data = await res.json();
 
-        var secretKey = document.getElementById('secretKeyInput').value.trim();
-        if (!secretKey) {
-          // secret_key 미입력 시 기존처럼 프론트 검증만
-          debugLog('login', 'OK (서버 검증 생략)', 'success');
-          showToast('success');
-          return;
-        }
+    var resultEl = document.getElementById('l2Result');
+    resultEl.style.display = 'block';
 
-        // secret_key 입력 시 siteverify 호출
-        debugLog('siteverify', '서버 검증 요청 중...');
+    var existingCanvas = resultEl.querySelector('canvas');
+    resultEl.innerHTML = '';
+    if (existingCanvas) resultEl.appendChild(existingCanvas);
+
+    var txt = document.createElement('div');
+    txt.style.position = 'relative';
+    txt.style.zIndex = '1';
+    txt.style.padding = '8px 0';
+
+    if (data.success) {
+      debugLog('L2 PASS', '검증 성공', 'success');
+      txt.className = 'result-success';
+      txt.innerHTML = '<b>검증 성공!</b><br>포즈: ' + (data.detectedPose||'-') + '<br>텍스트: ' + (data.detectedText||'-');
+      l2Stop();
+
+      var secretKey = document.getElementById('l2SecretKey').value.trim();
+      if (secretKey && data.passToken) {
+        debugLog('L2 siteverify', '서버 검증 요청 중...');
         try {
-          var res = await fetch(apiBase + '/api/captcha/siteverify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              secret: secretKey,
-              response: captchaToken
-            })
+          var svRes = await fetch(apiBase + '/api/captcha/siteverify', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret: secretKey, response: data.passToken })
           });
-          var data = await res.json();
-
-          if (data.success) {
-            debugLog('siteverify', 'SUCCESS (score: ' + (data.score || '-') + ')', 'success');
-            showToast('success');
+          var svData = await svRes.json();
+          if (svData.success) {
+            debugLog('L2 siteverify', 'SUCCESS (score: ' + (svData.score||'-') + ')', 'success');
+            txt.innerHTML += '<br><span style="color:#1b5e20;">siteverify OK</span>';
           } else {
-            var errMsg = (data.error_codes || []).join(', ') || '검증 실패';
-            debugLog('siteverify', 'FAIL: ' + errMsg, 'error');
-            showToast('error', '서버 검증 실패: ' + errMsg);
+            debugLog('L2 siteverify', 'FAIL: ' + (svData.error_codes||[]).join(', '), 'error');
           }
-        } catch (err) {
-          debugLog('siteverify', 'ERROR: ' + err.message, 'error');
-          showToast('error', '서버 검증 요청 실패: ' + err.message);
+        } catch(svErr) {
+          debugLog('L2 siteverify', 'ERROR: ' + svErr.message, 'error');
         }
-      });
+      }
+    } else {
+      var fr = data.failureReason || {};
+      debugLog('L2 FAIL', (fr.type||'FAIL') + ' / ' + (data.message||''), 'error');
+      txt.className = 'result-fail';
+      txt.innerHTML = '<b>검증 실패</b> [' + (fr.type||'UNKNOWN') + ']<br>' + (data.message||'');
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initCaptcha);
-    } else { initCaptcha(); }
-  </script>
+    resultEl.appendChild(txt);
+    setTimeout(initRoughUI, 30);
+
+  } catch(err) {
+    debugLog('L2 verify', 'ERROR: ' + err.message, 'error');
+    showToast('error', 'L2 검증 요청 실패: ' + err.message);
+  }
+
+  fillBtn('btn-l2', false);
+}
+
+function l2Stop() {
+  if (l2Stream) { l2Stream.getTracks().forEach(function(t) { t.stop(); }); l2Stream = null; }
+}
+
+function l2Reset() {
+  l2SessionId = null;
+  l2Stop();
+  document.getElementById('missionBox').style.display = 'none';
+  document.getElementById('videoWrap').style.display = 'none';
+  document.getElementById('uploadArea').style.display = 'none';
+  document.getElementById('l2VerifyBtnWrap').style.display = 'none';
+  document.getElementById('l2Result').style.display = 'none';
+  document.getElementById('l2ImageInput').value = '';
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('videoPlaceholder').style.display = 'flex';
+  document.getElementById('videoPlaceholder').textContent = '카메라 접근 중...';
+  debugLog('L2', '초기화됨');
+}
+
+function previewImage() {
+  var f = document.getElementById('l2ImageInput').files[0];
+  if (!f) return;
+  var prev = document.getElementById('imgPreview');
+  prev.src = URL.createObjectURL(f);
+  prev.style.display = 'block';
+}
+
+// Chat AI
+function appendBubble(text, cls, detail) {
+  var container = document.getElementById('chatMessages');
+  var wrap = document.createElement('div');
+  wrap.style.display = 'flex';
+  wrap.style.flexDirection = 'column';
+  wrap.style.alignItems = cls === 'bubble-user' ? 'flex-end' : 'flex-start';
+
+  var bubble = document.createElement('div');
+  bubble.className = 'chat-bubble ' + cls;
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+
+  if (detail) {
+    var sub = document.createElement('div');
+    sub.className = 'bubble-stage';
+    sub.textContent = detail;
+    wrap.appendChild(sub);
+  }
+
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendChat() {
+  var input = document.getElementById('chatInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  await runChatCheck(msg);
+}
+
+function quickChat(msg) { runChatCheck(msg); }
+
+async function runChatCheck(msg) {
+  appendBubble(msg, 'bubble-user');
+
+  var saasKey = document.getElementById('chatSaasKey').value.trim();
+  var secretKey = document.getElementById('chatSecretKey').value.trim();
+  if (!saasKey) { showToast('error', 'API 키를 먼저 입력하세요'); return; }
+
+  debugLog('Chat', '메시지: ' + msg);
+
+  var headers = { 'Content-Type': 'application/json', 'X-Saas-Key': saasKey };
+  if (secretKey) headers['X-Saas-Secret'] = secretKey;
+
+  try {
+    var res = await fetch(apiBase + '/api/saas/chat/check', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ content: msg })
+    });
+
+    if (!res.ok) {
+      var errData = await res.json().catch(function() { return {}; });
+      var errCodes = (errData.detail && errData.detail.error_codes) ? errData.detail.error_codes.join(', ') : res.status;
+      debugLog('Chat', 'HTTP ' + res.status + ': ' + errCodes, 'error');
+      showToast('error', '요청 실패: ' + errCodes);
+      return;
+    }
+
+    var data = await res.json();
+    debugLog('Chat result', JSON.stringify(data));
+
+    if (!data.violation) {
+      appendBubble('통과', 'bubble-ok', 'Stage ' + (data.stage||'?') + (data.score != null ? ' | score: ' + data.score.toFixed(3) : ''));
+      debugLog('Chat PASS', data.reason||'정상', 'success');
+    } else if (data.severe) {
+      appendBubble('차단: ' + (data.reason||'심한 욕설'), 'bubble-block', 'Stage ' + (data.stage||'?'));
+      debugLog('Chat BLOCK', data.reason, 'error');
+    } else {
+      appendBubble('경고: ' + (data.reason||'부적절한 표현'), 'bubble-warn', 'Stage ' + (data.stage||'?'));
+      debugLog('Chat WARN', data.reason, 'warn');
+    }
+
+  } catch(err) {
+    debugLog('Chat', 'ERROR: ' + err.message, 'error');
+    showToast('error', '요청 실패: ' + err.message);
+  }
+}
+
+function clearChat() {
+  var container = document.getElementById('chatMessages');
+  var existingCanvas = container.querySelector('canvas');
+  container.innerHTML = '';
+  if (existingCanvas) container.appendChild(existingCanvas);
+  debugLog('Chat', '채팅 초기화');
+}
+</script>
 
 </body>
 </html>
