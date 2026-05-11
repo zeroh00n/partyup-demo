@@ -770,7 +770,6 @@ async function l2Verify() {
 
       var secretKey = document.getElementById('l2SecretKey').value.trim();
       if (secretKey && data.passToken) {
-        debugLog('L2 siteverify', '서버 검증 요청 중...');
         try {
           var svRes = await fetch(apiBase + '/api/captcha/siteverify', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -780,12 +779,8 @@ async function l2Verify() {
           if (svData.success) {
             debugLog('L2 siteverify', 'SUCCESS (score: ' + (svData.score||'-') + ')', 'success');
             txt.innerHTML += '<br><span style="color:#1b5e20;">siteverify OK</span>';
-          } else {
-            debugLog('L2 siteverify', 'FAIL: ' + (svData.error_codes||[]).join(', '), 'error');
           }
-        } catch(svErr) {
-          debugLog('L2 siteverify', 'ERROR: ' + svErr.message, 'error');
-        }
+        } catch(svErr) {}
       }
     } else {
       var fr = data.failureReason || {};
